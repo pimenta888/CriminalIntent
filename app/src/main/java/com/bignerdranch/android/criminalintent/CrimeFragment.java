@@ -8,6 +8,9 @@ import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -22,6 +25,7 @@ public class CrimeFragment extends Fragment {
 
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String HAS_CRIME_CHANGED = "com.bignerdranch.android.criminalintent.has_crime_changed";
+    private static final String DELETED_CRIME = "com.bignerdranch.android.criminalintent.deleted_crime";
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE = 0;
 
@@ -31,6 +35,7 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private CheckBox mPoliceCheckBox;
     private boolean mHasCrimeChanged = false;
+    private boolean mItemRemoved = false;
 
     public static CrimeFragment newInstance(UUID crimeId){
         Bundle args =new Bundle();
@@ -49,9 +54,14 @@ public class CrimeFragment extends Fragment {
         return (UUID) result.getSerializableExtra(ARG_CRIME_ID);
     }
 
+    public static boolean itemRemoved(Intent result) {
+        return result.getBooleanExtra(DELETED_CRIME, false);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
@@ -124,6 +134,7 @@ public class CrimeFragment extends Fragment {
         Intent data = new Intent();
         data.putExtra(HAS_CRIME_CHANGED, mHasCrimeChanged);
         data.putExtra(ARG_CRIME_ID, mCrime.getId());
+        data.putExtra(DELETED_CRIME, mItemRemoved);
         getActivity().setResult(Activity.RESULT_OK, data);
     }
     @Override
@@ -140,4 +151,30 @@ public class CrimeFragment extends Fragment {
     private void updateDate() {
         mDateButton.setText(mCrime.getDate().toString());
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_crime, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case R.id.delete_crime:
+                CrimeLab.get(getActivity()).deleteCrime(mCrime);
+                mItemRemoved = true;
+                returnResult();
+                getActivity().finish();
+                return true;
+            case android.R.id.home:
+                getActivity().finish();
+                mHasCrimeChanged = true;
+                returnResult();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }
+

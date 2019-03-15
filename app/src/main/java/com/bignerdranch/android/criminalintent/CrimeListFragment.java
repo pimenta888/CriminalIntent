@@ -24,8 +24,10 @@ import java.util.UUID;
 public class CrimeListFragment extends Fragment {
 
     private static final int REQUEST_CRIME = 1;
+    private static final String SAVED_SUBTITLE_VISIBLE = "subtitle";
 
     private boolean mItemHasChanged = false;
+    private boolean mItemRemoved = false;
     private UUID mItemChangedId;
 
     private RecyclerView mCrimeRecyclerView;
@@ -43,12 +45,22 @@ public class CrimeListFragment extends Fragment {
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.fragment_crime_list, container, false);
 
+        if (savedInstanceState != null) {
+            mSubtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE);
+        }
+
         mCrimeRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         updateUI();
 
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVED_SUBTITLE_VISIBLE, mSubtitleVisible);
     }
 
     @Override
@@ -116,6 +128,12 @@ public class CrimeListFragment extends Fragment {
                 int mItemChangedPosition = mAdapter.getCrimeIndex(mItemChangedId);
                 mAdapter.notifyItemChanged(mItemChangedPosition);
             }
+            if (mItemRemoved){
+                //because when I remove an Item I don't have the UUID on the list
+                // after returning to CrimeListFragment so
+                //I update all the list
+                mAdapter.notifyDataSetChanged();
+            }
         }
         updateSubtitle();
     }
@@ -131,6 +149,7 @@ public class CrimeListFragment extends Fragment {
                 return;
             }
             mItemHasChanged = CrimePagerActivity.hasCrimeChanged(data);
+            mItemRemoved = CrimePagerActivity.itemRemoved(data);
             mItemChangedId = CrimePagerActivity.getCrimeId(data);
         }
     }

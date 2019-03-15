@@ -47,8 +47,12 @@ public class CrimePagerActivity extends AppCompatActivity {
         }
     }
 
-    public static  boolean hasCrimeChanged(Intent result){
+    public static boolean hasCrimeChanged(Intent result){
         return  CrimeFragment.hasCrimeChanged(result);
+    }
+
+    public static boolean itemRemoved(Intent result){
+        return  CrimeFragment.itemRemoved(result);
     }
 
     public static UUID getCrimeId(Intent result){
@@ -57,7 +61,7 @@ public class CrimePagerActivity extends AppCompatActivity {
 
     public static Intent newIntent(Context packageContext, UUID crimeId) {
         Intent intent = new Intent(packageContext, CrimePagerActivity.class);
-        intent.putExtra(EXTRA_CRIME_ID, crimeId); return intent;
+        intent.putExtra(EXTRA_CRIME_ID, crimeId);
+        return intent;
     }
-
 }

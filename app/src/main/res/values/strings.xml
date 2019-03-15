@@ -10,4 +10,5 @@
     <string name="hide_subtitle">Hide Subtitle</string>
     <string name="subtitle_format">%1$d crimes</string>
     <string name="police_should_be_contacted">Police should be contacted</string>
+    <string name="delete_crime">Delete crime</string>
 </resources>
