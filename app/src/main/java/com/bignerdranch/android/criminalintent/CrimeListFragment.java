@@ -108,7 +108,6 @@ public class CrimeListFragment extends Fragment {
 
     public void updateSubtitle(){
         CrimeLab crimeLab = CrimeLab.get(getActivity());
-        int crimeCount = crimeLab.getCrimes().size();
         int crimeSize = crimeLab.getCrimes().size();
         String subtitle = getResources().getQuantityString(R.plurals.subtitle_plural, crimeSize, crimeSize);
 
@@ -138,12 +137,14 @@ public class CrimeListFragment extends Fragment {
         }else{
             if(mItemHasChanged){
                 int mItemChangedPosition = mAdapter.getCrimeIndex(mItemChangedId);
+                mAdapter.setCrimes(crimes);
                 mAdapter.notifyItemChanged(mItemChangedPosition);
             }
             if (mItemRemoved){
                 //because when I remove an Item I don't have the UUID on the list
                 // after returning to CrimeListFragment so
                 //I update all the list
+                mAdapter.setCrimes(crimes);
                 mAdapter.notifyDataSetChanged();
             }
         }
@@ -224,7 +225,11 @@ public class CrimeListFragment extends Fragment {
             return mCrimes.size();
         }
 
-        //I need this because I can't convert UUID to int and it’s necessary for the position in list that I want to update.
+        public void setCrimes(List<Crime> crimes) {
+            mCrimes = crimes;
+        }
+
+            //I need this because I can't convert UUID to int and it’s necessary for the position in list that I want to update.
         private int getCrimeIndex(UUID crimeId) {
             for (int i = 0; i < mCrimes.size(); i++) {
                 Crime crime = mCrimes.get(i);
